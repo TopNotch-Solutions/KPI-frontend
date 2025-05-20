@@ -14,7 +14,7 @@ import Dashboard from "./pages/Dashboard";
 // import User from "./pages/User";
 // import Notifications from "./pages/Notifications";
 // import Reporting from "./pages/Reporting";
-// import Profile from "./pages/Profile";
+import Profile from "./pages/Profile";
 import { useSelector } from "react-redux";
 import AdminRoute from "./AdminRoute";
 // import SubmitEmail from "./pages/SubmitEmail";
@@ -57,6 +57,7 @@ function App() {
                   <Route path="/" element={<Login />} />
                   <Route element={<AdminRoute />}>
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/profile" element={<Profile />} />
                     {/* <Route path="/bso" element={<Bso />} />
                     <Route path="/users" element={<User />} />
                     <Route path="/content" element={<Content />} />

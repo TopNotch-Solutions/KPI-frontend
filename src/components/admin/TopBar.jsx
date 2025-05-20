@@ -27,85 +27,10 @@ const Topbar = ({ OpenSidebar }) => {
   const updatingState = useSelector((state) => state.submitting.isSubmitting);
   const [isSubmitting, setIsSubmitting] = useState(false);
   let fullName = currentUser?.firstname + currentUser?.lastname;
-  const tokenHeader = currentUser.token;
   const [allNotificationsCount,setAllNotificationsCount] = useState(0);
   let firstLetter = CapitalizeFirstLetter(currentUser?.firstname);
   let secondLetter = CapitalizeFirstLetter(currentUser?.lastname);
-  useEffect(() => {
-    const fetchAllAdminNotificationsCount = async () => {
-      try {
-        const response = await fetch(
-          `https://dt.mtc.com.na:4000/notifications/admin/totalNotificationCount`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `${serverToken}`,
-              'x-access-token': `${tokenHeader}`
-            },
-            //
-          }
-        );
-        
-        const data = await response.json();
-        const newTokenHeader = response.headers.get('x-access-token');
-        dispatch(updateToken({
-          token: newTokenHeader
-        }));
-        if (response.ok) {
-          setAllNotificationsCount(data.count);
-        } else {
-        }
-      } catch (error) {}
-    };
 
-    fetchAllAdminNotificationsCount();
-  }, [isSubmitting, updatingState]);
-
-  const handleLogout = async () => {
-    try {
-      const response = await fetch("https://dt.mtc.com.na:4000/auth/admin/logout", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `${tokenHeader}`,
-          'x-access-token': `${tokenHeader}`
-        },
-        //
-      });
-
-      const data = await response.json();
-        const newTokenHeader = response.headers.get('x-access-token');
-        dispatch(updateToken({
-          token: newTokenHeader
-        }));
-
-      if (response.ok) {
-        dispatch(toggleAuthenticationfalse());
-        dispatch(toggleSidebarfalse());
-        dispatch(
-          login({
-            user: {},
-          })
-        );
-        navigate("/");
-      } else {
-        dispatch(toggleAuthenticationfalse())
-        dispatch(toggleSidebarfalse());
-        
-        dispatch(
-          login({
-            user: {},
-          })
-        );
-        navigate("/");
-      }
-    } catch (error) {
-      // Handle the network error
-      // For example, show an error message
-      // toast.error("Network error. Please check your network connection and try again");
-    }
-  };
   return (
     <Box
       className="topbar-container"
@@ -184,7 +109,16 @@ const Topbar = ({ OpenSidebar }) => {
             >
               <BsPersonGear /> Profile
             </Dropdown.Item>
-            <Dropdown.Item onClick={handleLogout} className="dropdown-item">
+            <Dropdown.Item onClick={() =>{
+              dispatch(toggleAuthenticationfalse());
+        dispatch(toggleSidebarfalse());
+        dispatch(
+          login({
+            user: {},
+          })
+        );
+        navigate("/");
+            }} className="dropdown-item">
               <BsBoxArrowRight /> Logout
             </Dropdown.Item>
           </Dropdown.Menu>

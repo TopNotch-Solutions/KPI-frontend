@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "../assets/css/login.css";
-import logo from "../assets/images/in4logo.png";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -109,6 +108,7 @@ const AdminLogin = () => {
               setIsSubmitting(false);
               setTwoFactorDigits(""); 
               dispatch(toggleAuthenticationTrue());
+              console.log(loginData.details);
               dispatch(
               login({
                 user: loginData.details,
