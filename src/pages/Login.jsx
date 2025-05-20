@@ -133,15 +133,7 @@ const AdminLogin = () => {
   
   return (
     <div className="login-container">
-      <div className="login-wrapper">
-        {/* Left side with logo */}
-        <div className="login-logo-section">
-         <div className="login-branding">
-      <h1>KPI Portal</h1>
-      <p>Driving Performance. Empowering Decisions. Enabling Growth.</p>
-    </div>
-
-        </div>
+      
 
         {/* Right side with forms */}
         <div className="login-form-section">
@@ -220,7 +212,6 @@ const AdminLogin = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
