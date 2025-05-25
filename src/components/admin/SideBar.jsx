@@ -61,7 +61,7 @@ const Sidebar = ({ openSidebarToggle, OpenSidebar }) => {
     >
       <div className="sidebar-header">
         <div className="sidebar-brand">
-          <Tooltip title="in4msme portal">
+          <Tooltip title="KPI portal">
             <NavLink
               to="/Dashboard"
               onClick={() => handleNavLinkClick(1)}
