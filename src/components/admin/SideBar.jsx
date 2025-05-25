@@ -20,7 +20,8 @@ const menuItems = [
   { id: 1, title: "Dashboard", icon: DashboardIcon, path: "/Dashboard" },
   { id: 2, title: "Marshal Shifts", icon: AddBusinessIcon, path: "/Shifts" },
   { id: 3, title: "Manage Users", icon: PeopleAltIcon, path: "/Users" },
-  { id: 7, title: "Generate Reports", icon: PictureAsPdfIcon, path: "/Reporting" },
+  { id: 4, title: "Manage Streets", icon: AssignmentIcon, path: "/Devices" },
+  { id: 7, title: "Generate Reports", icon: PictureAsPdfIcon, path: "/Reports" },
   { id: 8, title: "Profile", icon: AccountCircleIcon, path: "/Profile" },
 ];
 

@@ -45,7 +45,7 @@ const modalStyle = {
   overflowY: 'auto'
 };
 
-function Dashboard() {
+function User() {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
@@ -58,7 +58,6 @@ function Dashboard() {
   const [totalAdmins, setTotalAdmins] = useState("");
   const [totalAppUsers, setTotalAppUsers] = useState("");
   const [adminList, setAdminList] = useState([]);
-  const [streetList, setStreetList] = useState([]);
 
   const [firstName, setFirstName] = useState("");
   const [firstNameError, setFirstNameError] = useState("");
@@ -72,6 +71,7 @@ function Dashboard() {
   const [contactNumberError, setContactNumberError] = useState("");
   const [role, setRole] = useState("");
   const [roleError, setRoleError] = useState("");
+  const [newData, setNewData] = useState([])
 
   const [firstNameDetails, setFirstNameDetails] = useState("");
   const [firstNameDetailsError, setFirstNameDetailsError] = useState("");
@@ -125,46 +125,11 @@ function Dashboard() {
     setOpenModelEditing(false);
   };
   useEffect(() => {
-      const fetchApprovedCount = async () => {
-        try {
-          dispatch(toggleIsSubmittingTrue());
-          const response = await fetch(
-            "http://localhost:4000/street/all-street",
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              //  Authorization: `${serverToken}`,
-              //  'x-access-token': `${tokenHeader}`
-              },
-              
-            }
-          );
-  
-          const data = await response.json();
-          
-  
-          if (response.ok) {
-            dispatch(toggleIsSubmittingfalse());
-            setStreetList(data.data);
-          } else {
-            dispatch(toggleIsSubmittingfalse());
-           // handleAuthFailure({ dispatch, navigate, type: "auth" });
-          }
-        } catch (error) {
-          dispatch(toggleIsSubmittingfalse());
-          
-        }
-      };
-  
-      fetchApprovedCount();
-    }, [isSubmitting]);
-  useEffect(() => {
     const fetchTotalCount = async () => {
       try {
         dispatch(toggleIsSubmittingTrue());
         const response = await fetch(
-          "http://localhost:4000/supervisor/all-users",
+          "http://localhost:4000/street/all-street",
           {
             method: "GET",
             headers: {
@@ -180,6 +145,7 @@ function Dashboard() {
 
         if (response.ok) {
           dispatch(toggleIsSubmittingfalse());
+          console.log(data.total)
           setTotalSystemUsers(data.total);
         } else {
           dispatch(toggleIsSubmittingfalse());
@@ -198,7 +164,7 @@ function Dashboard() {
       try {
         dispatch(toggleIsSubmittingTrue());
         const response = await fetch(
-          "http://localhost:4000/supervisor/all-marshalls",
+          "http://localhost:4000/street/all-active",
           {
             method: "GET",
             headers: {
@@ -232,7 +198,7 @@ function Dashboard() {
       try {
         dispatch(toggleIsSubmittingTrue());
         const response = await fetch(
-          "http://localhost:4000/supervisor/all-supervisors",
+          "http://localhost:4000/street/all-inactive",
           {
             method: "GET",
             headers: {
@@ -248,6 +214,7 @@ function Dashboard() {
         
 
         if (response.ok) {
+          console.log(data)
           dispatch(toggleIsSubmittingfalse());
           setTotalAdmins(data.total);
         } else {
@@ -267,7 +234,7 @@ function Dashboard() {
       try {
         dispatch(toggleIsSubmittingTrue());
         const response = await fetch(
-          "http://localhost:4000/supervisor/all-admins",
+          "http://localhost:4000/street/all-under-maintenance",
           {
             method: "GET",
             headers: {
@@ -300,7 +267,7 @@ function Dashboard() {
       try {
         dispatch(toggleIsSubmittingTrue());
         const response = await fetch(
-          "http://localhost:4000/supervisor/all-users",
+          "http://localhost:4000/street/all-street",
           {
             method: "GET",
             headers: {
@@ -317,7 +284,7 @@ function Dashboard() {
 
         if (response.ok) {
           dispatch(toggleIsSubmittingfalse());
-          setAdminList(data.users);
+          setAdminList(data.data);
         } else {
           dispatch(toggleIsSubmittingfalse());
          // handleAuthFailure({ dispatch, navigate, type: "auth" });
@@ -331,36 +298,29 @@ function Dashboard() {
     fetchApprovedCount();
   }, [isSubmitting]);
 
-  const handleUpdate = async (email) => {
+  const handleUpdate = async (id) => {
     try {
       const response = await fetch(
-        "http://localhost:4000/auth/user-details",
+          `http://localhost:4000/street/single/${id}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
-           // Authorization: `${serverToken}`,
-           // 'x-access-token': `${tokenHeader}`
           },
-          body: JSON.stringify({
-            email,
-          }),
+          
         }
       );
 
       const data = await response.json();
 
-      
+      const street = data.data[0];
 
-      if (response.ok) {
-        setUpdatingDetails(data.data);
-        setFirstNameDetails(data.data.firstName);
-        setLastNameDetails(data.data.lastName);
-        setEmailDetails(data.data.email);
-        setRoleDetails(data.data.role);
-        setContactNumberDetails(data.data.phoneNumber);
-        setOpenModelEditing(true);
-        //setAdminList(data.data);
+if (response.ok) {
+  setUpdatingDetails(street);
+  setFirstNameDetails(street.streetCode);
+  setLastNameDetails(street.priority);
+  setRoleDetails(street.status);
+  setOpenModelEditing(true);
       } else {
         await Swal.fire({
           position: "center",
@@ -376,11 +336,11 @@ function Dashboard() {
     }
     //setOpenModelEditing(true)
   };
-  const handleDeletion = async (email) => {
-    if (currentUser.email === email) {
+  const handleDeletion = async (id) => {
+    
       Swal.fire({
         title: "Are you sure?",
-        text: "Your Account will be removed from the system completely!",
+        text: "Street will be removed from the system completely!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
@@ -392,67 +352,14 @@ function Dashboard() {
             setIsSubmitting(true);
 
             const response = await fetch(
-              "http://localhost:4000/auth/delete",
+              "http://localhost:4000/street/single",
               {
                 method: "DELETE",
                 headers: {
                   "Content-Type": "application/json",
                 },
                 
-                body: JSON.stringify({ userId: email }),
-              }
-            );
-
-            const data = await response.json();
-            
-            if (response.ok) {
-              dispatch(toggleSidebarfalse());
-              dispatch(
-                login({
-                  user: {},
-                })
-              );
-              navigate("/");
-            } else {
-              await Swal.fire({
-                position: "center",
-                icon: "error",
-                title: `${data.message}`,
-                showConfirmButton: false,
-                timer: 4000,
-              });
-              
-            }
-          } catch (error) {
-            
-          } finally {
-            setIsSubmitting(false);
-          }
-        }
-      });
-    } else {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "Account will be removed from the system completely!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            setIsSubmitting(true);
-
-            const response = await fetch(
-              "http://localhost:4000/auth/delete",
-              {
-                method: "DELETE",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                
-                body: JSON.stringify({ userId: email }),
+                body: JSON.stringify({ id }),
               }
             );
 
@@ -462,7 +369,7 @@ function Dashboard() {
               Swal.fire({
                 position: "center",
                 icon: "success",
-                title: `${updatingDetails.role} Successfully Deleted`,
+                title: `Street Successfully Deleted`,
                 showConfirmButton: false,
                 timer: 4000,
               });
@@ -483,53 +390,43 @@ function Dashboard() {
           }
         }
       });
-    }
+    
   };
 
   const columns = [
     {
-      field: "firstName",
-      headerName: "first Name",
+      field: "streetCode",
+      headerName: "Street code",
       width: isSmallScreen ? 100 : 170,
     },
     {
-      field: "lastName",
-      headerName: "Last Name",
+      field: "priority",
+      headerName: "Priority",
       width: isSmallScreen ? 100 : 170,
     },
-    { field: "email", headerName: "Email", width: isSmallScreen ? 120 : 220 },
-    { field: "role", headerName: "Role", width: isSmallScreen ? 130 : 130 },
-    { field: "device", headerName: "Device", width: isSmallScreen ? 130 : 150 },
-    {
-      field: "createdAt",
-      headerName: "Created Date",
-      width: isSmallScreen ? 180 : 220,
-    },
+    { field: "status", headerName: "Status", width: isSmallScreen ? 120 : 220 },
     {
       field: "action",
       headerName: "",
       width: isSmallScreen ? 230 : 350,
-      // renderCell: (params) => (
-      //   <>
-      //     {currentUser.role !== "Marshall" && (
-      //       <>
-      //         <UpdateButton onClick={() => handleUpdate(params.row.email)} />
-      //         <DeleteButton onClick={() => handleDeletion(params.row.email)} />
-      //       </>
-      //     )}
-      //   </>
-      // ),
+      renderCell: (params) => (
+        <>
+          {currentUser.role !== "Marshall" && (
+            <>
+              <UpdateButton onClick={() => handleUpdate(params.row.id)} />
+              <DeleteButton onClick={() => handleDeletion(params.row.id)} />
+            </>
+          )}
+        </>
+      ),
     },
   ];
 
   const rows = adminList.map((admin) => ({
     id: admin.id,
-    firstName: admin.firstName,
-    lastName: admin.lastName,
-    email: admin.email,
-    role: admin.role,
-    device: admin.device,
-    createdAt: admin.createdAt,
+    streetCode: admin.streetCode,
+    priority: admin.priority,
+    status: admin.status
   }));
 
   const filteredRows = rows.filter((row) =>
@@ -538,90 +435,29 @@ function Dashboard() {
     )
   );
 
-  const streetRows = streetList.map((admin) => ({
-    id: admin.id,
-    streetCode: admin.streetCode,
-    priority: admin.priority,
-    status: admin.status
-  }));
-
-  const streetColumns = [
-      {
-        field: "streetCode",
-        headerName: "Street code",
-        width: isSmallScreen ? 100 : 170,
-      },
-      {
-        field: "priority",
-        headerName: "Priority",
-        width: isSmallScreen ? 100 : 170,
-      },
-      { field: "status", headerName: "Status", width: isSmallScreen ? 120 : 220 },
-      
-    ];
-
-  const filteredStreetRows = streetRows.filter((row) =>
-    Object.values(row).some((value) =>
-      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  );
-
   const companyDepartmentsOptions = [
-    { value: "Human Resources" },
-    { value: "Finance and Accounting" },
-    { value: "Marketing" },
-    { value: "Sales" },
-    { value: "Operations" },
-    { value: "Information Technology" },
-    { value: "Legal" },
-    { value: "Research and Development (R&D)" },
-    { value: "Customer Service" },
-    { value: "Administration" },
-    { value: "Procurement" },
-    { value: "Public Relations" },
-    { value: "Product Management" },
-    { value: "Quality Assurance" },
-    { value: "Logistics" },
-    { value: "Health and Safety" },
-    { value: "Corporate Strategy" },
-    { value: "Training and Development" },
-    { value: "Compliance" },
-    { value: "Facilities Management" },
-    { value: "Environmental Management" },
-    { value: "Business Development" },
-    { value: "Investor Relations" },
-    { value: "Event Management" },
-    { value: "Security" },
-    { value: "Internal Audit" },
-    { value: "Supply Chain Management" },
-    { value: "Technical Support" },
-    { value: "Creative Services" },
-    { value: "Legal Compliance" },
+    { value: "Active" },
+    { value: "Inactive" },
+    { value: "Under Maintainance" },
   ];
 
   const roleOptions = [
     {
-      value: "Supervisor",
+      value: 1,
     },
     {
-      value: "Marshall",
+      value: 2,
     },
     {
-      value: "Admin",
+      value: 3,
     },
 
   ];
 
   const fields1 = [
-    { value: firstName, setError: setFirstNameError, name: "First Name" },
-    { value: lastName, setError: setlastNameError, name: "Last Name" },
-    { value: email, setError: setEmailError, name: "Email" },
-    { value: role, setError: setRoleError, name: "Role" },
-    {
-      value: contactNumber,
-      setError: setContactNumberError,
-      name: "Contact Number",
-    },
+    { value: firstName, setError: setFirstNameError, name: "Street code" },
+    { value: lastName, setError: setlastNameError, name: "Priority" },
+    { value: role, setError: setRoleError, name: "Status" }
   ];
   const validateFields1 = () => {
     let isValid = true;
@@ -630,19 +466,6 @@ function Dashboard() {
       if (!field.value) {
         field.setError(`${field.name} is required.`);
         isValid = false;
-      }else{
-        if (field.name === "Email" && field.value) {
-          if (!emailRegex.test(field.value)) {
-            field.setError("Invalid email format.");
-            isValid = false;
-          }
-        }
-        if (field.name === "Contact Number" && field.value) {
-          if (!namibiaPhoneRegex.test(field.value)) {
-            field.setError("Invalid phone number.");
-            isValid = false;
-          }
-        }
       }
     });
     return isValid;
@@ -659,13 +482,8 @@ function Dashboard() {
       setError: setlastNameDetailsError,
       name: "Last Name",
     },
-    { value: emailDetails, setError: setEmailDetailsError, name: "Email" },
+    
     { value: roleDetails, setError: setRoleDetailsError, name: "Role" },
-    {
-      value: contactNumberDetails,
-      setError: setContactNumberDetailsError,
-      name: "Contact Number",
-    },
   ];
   const validateFields2 = () => {
     let isValid = true;
@@ -674,32 +492,17 @@ function Dashboard() {
       if (!field.value) {
         field.setError(`${field.name} is required.`);
         isValid = false;
-      }else{
-        if (field.name === "Email" && field.value) {
-          if (!emailRegex.test(field.value)) {
-            field.setError("Invalid email format.");
-            isValid = false;
-          }
-        }
-  
-        if (field.name === "Contact Number" && field.value) {
-          if (!namibiaPhoneRegex.test(field.value)) {
-            field.setError("Invalid phone number.");
-            isValid = false;
-          }
-        }
       }
     });
     return isValid;
   };
 
   const handleSubmitUpdate = async () => {
+    console.log(firstNameDetails)
     if (
-      updatingDetails.firstName === firstNameDetails &&
-      updatingDetails.lastName === lastNameDetails &&
-      updatingDetails.email === emailDetails &&
-      updatingDetails.role === roleDetails &&
-      updatingDetails.contactNumber === contactNumberDetails
+      updatingDetails.streetCode === firstNameDetails &&
+      updatingDetails.priority === lastNameDetails &&
+      updatingDetails.status === roleDetails
     ) {
       setUpdatingFail("You have not made any changes");
     } else {
@@ -707,14 +510,13 @@ function Dashboard() {
         try {
           setIsSubmitting(true);
           const requestData = {
-            firstname: firstNameDetails,
-            lastname: lastNameDetails,
-            email: emailDetails,
-            phoneNumber: contactNumberDetails,
-            role: roleDetails,
+            id: updatingDetails.id,
+            streetCode: firstNameDetails,
+            priority: lastNameDetails,
+            status: roleDetails,
           };
           const response = await fetch(
-            `http://localhost:4000/auth/update/user/details/${updatingDetails.id}`,
+            `http://localhost:4000/street/single`,
             {
               method: "PUT",
               headers: {
@@ -733,7 +535,7 @@ function Dashboard() {
             Swal.fire({
               position: "center",
               icon: "success",
-              title: `${roleDetails} Details Successfully Updated`,
+              title: `Street Successfully Updated`,
               showConfirmButton: false,
               timer: 4000,
             });
@@ -768,18 +570,17 @@ function Dashboard() {
   };
   const handleSubmit = async () => {
     if (validateFields1()) {
+      console.log("here is the device: ",department)
       try {
         setIsSubmitting(true);
         const requestData = {
-          firstname:firstName,
-          lastname:lastName,
-          email,
-          phoneNumber:contactNumber,
-          role,
+          streetCode:firstName,
+          priority:lastName,
+          status:role,
         };
 
         const response = await fetch(
-          "http://localhost:4000/auth/sign-up",
+          "http://localhost:4000/street/create",
           {
             method: "POST",
             headers: {
@@ -798,14 +599,13 @@ function Dashboard() {
           Swal.fire({
             position: "center",
             icon: "success",
-            title: `${role} Successfully Added`,
+            title: `${firstName} Successfully Added`,
             showConfirmButton: false,
             timer: 4000,
           });
           setFirstName("");
           setLastName("");
-          setEmail("");
-          setContactNumber("");
+          
           setRole("");
         } else {
           setIsSubmitting(false);
@@ -819,8 +619,7 @@ function Dashboard() {
           });
           setFirstName("");
           setLastName("");
-          setEmail("");
-          setContactNumber("");
+          
           setRole("");
         }
       } catch (error) {
@@ -861,8 +660,8 @@ function Dashboard() {
               >
                 <div className="col-12 p-5 shadow rounded-2">
                   <div className="d-flex justify-content-between">
-                    <Tooltip title="Total Users" className="pointer">
-                      <p className="text">Total Users</p>
+                    <Tooltip title="Total Streets" className="pointer">
+                      <p className="text">Total streets</p>
                     </Tooltip>
                     
                   </div>
@@ -884,8 +683,8 @@ function Dashboard() {
               >
                 <div className="col-12 p-5 shadow rounded-2">
                   <div className="d-flex justify-content-between">
-                    <Tooltip title="Super admins" className="pointer">
-                      <p className="text">Marshalls</p>
+                    <Tooltip title="Total active streets" className="pointer">
+                      <p className="text">Active streets</p>
                     </Tooltip>
 
                   </div>
@@ -907,8 +706,8 @@ function Dashboard() {
               >
                 <div className="col-12 p-5 shadow rounded-2">
                   <div className="d-flex justify-content-between">
-                    <Tooltip title="Admins" className="pointer">
-                      <p className="text">Supervisors</p>
+                    <Tooltip title="Total inactive streets" className="pointer">
+                      <p className="text">Inactive streets</p>
                     </Tooltip>
 
                    
@@ -931,8 +730,8 @@ function Dashboard() {
               >
                 <div className="col-12 p-5 shadow rounded-2">
                   <div className="d-flex justify-content-between">
-                    <Tooltip title="Mobile App Users" className="pointer">
-                      <p className="text">Admins</p>
+                    <Tooltip title="Total under maintanence" className="pointer">
+                      <p className="text">Under maintanence</p>
                     </Tooltip>
 
                   </div>
@@ -950,98 +749,40 @@ function Dashboard() {
                 gridRow="span 3"
               >
                 <div className="col-12 mb-4 listing-msme p-4 shadow rounded-3 mb-4">
-                  
-                  <div className="col-12 mt-1">
-                    <p className="list-groupp">System User List</p>
-                    {adminList ? (
+                  <div className="col-12 col-lg-12 col-xxl-9 mx-auto mt-4 d-flex justify-content-end">
+                    <Box
+                      display="flex"
+                      backgroundColor="rgba(245, 246, 248, 1)"
+                      borderRadius="3px"
+                      width="300px"
+                      marginRight="10px"
+                    >
+                      {/* rgba(245, 246, 248, 1) */}
+                      <InputBase
+                        sx={{ ml: 2, flex: 1 }}
+                        placeholder="Search here........."
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                      <IconButton type="button" sx={{ p: 1 }}>
+                        <SearchIcon />
+                      </IconButton>
+                    </Box>
+                    {currentUser.role === "Supervisor" && (
                       <>
-                        <Box sx={{ height: 500, width: "100%" }}>
-                          <DataGrid
-                            rows={filteredRows}
-                            columns={columns}
-                            sx={{
-                              "& .MuiDataGrid-root": {
-                                fontFamily: "Montserrat, sans-serif",
-                              },
-                              "& .status-pending": {
-                                color: "rgb(234, 156, 0)",
-                              },
-                              "& .status-rejected": {
-                                color: "red",
-                              },
-                              "& .status-approved": {
-                                color: "green",
-                              },
-                              "& .MuiDataGrid-columnHeaders": {
-                                fontWeight: 800,
-                                fontFamily: "Montserrat, sans-serif",
-                              },
-                              "& .MuiDataGrid-columnHeaderTitle": {
-                                fontWeight: 600,
-                                fontFamily: "Montserrat, sans-serif",
-                              },
-                              "& .MuiDataGrid-cell": {
-                                fontWeight: 400,
-                                fontFamily: "Montserrat, sans-serif",
-                              },
-                            }}
-                            initialState={{
-                              pagination: {
-                                paginationModel: {
-                                  pageSize: 25, 
-                                },
-                              },
-                            }}
-                            pageSizeOptions={[25, 50, 100]}
-                            checkboxSelection
-                            disableRowSelectionOnClick
-                          />
-                        </Box>
-                      </>
-                    ) : (
-                      <>
-                        <div
-                          className="d-flex justify-content-center align-items-center"
-                          style={{ height: 500, width: "100%" }}
-                        >
-                          <div style={{ textAlign: "center" }}>
-                            <CircularProgress color="inherit" />
-                            <p className="p-4 text-secondary">
-                              Just a moment, we’re getting things ready...
-                            </p>
-                          </div>
+                        <div onClick={handleOpen}>
+                          <MyButton text="Add Street" />
                         </div>
                       </>
                     )}
                   </div>
-                </div>
-              </Box>
-            </Box>{" "}
-          </Box>
-          <Box className="" justifyContent={"space-evenly"} marginTop={"180px"}>
-            <Box
-              display="grid"
-              gridTemplateColumns={
-                isSmallScreen ? "repeat(1, 1fr)" : "repeat(12, 1fr)"
-              }
-              gridAutoRows="140px"
-              gap={isSmallScreen ? "0px" : "10px"}
-            >
-
-              <Box
-                gridColumn={isSmallScreen ? "span 12" : "span 12"}
-                gridRow="span 3"
-              >
-                <div className="col-12 mb-4 listing-msme p-4 shadow rounded-3 mb-4">
-                  
                   <div className="col-12 mt-1">
                     <p className="list-groupp">Street List</p>
                     {adminList ? (
                       <>
                         <Box sx={{ height: 500, width: "100%" }}>
                           <DataGrid
-                            rows={filteredStreetRows}
-                            columns={streetColumns}
+                            rows={filteredRows}
+                            columns={columns}
                             sx={{
                               "& .MuiDataGrid-root": {
                                 fontFamily: "Montserrat, sans-serif",
@@ -1110,7 +851,7 @@ function Dashboard() {
             <Box sx={modalStyle}>
               <div className="d-flex justify-content-between align-items-center">
                 <div></div>
-                <h1 className="text-center">Add New User</h1>
+                <h1 className="text-center">Add New Street</h1>
                 <CgCloseR
                   style={{
                     color: "red",
@@ -1120,13 +861,12 @@ function Dashboard() {
                   onClick={() => {
                     setFirstName("");
                     setLastName("");
-                    setEmail("");
-                    setContactNumber("");
+          
                     setRole("");
                     setFirstNameError("");
                     setlastNameError("");
-                    setEmailError("");
-                    setContactNumberError("");
+                
+                    setDepartment("")
                     setRoleError("");
                     setOpenModel(false);
                   }}
@@ -1138,12 +878,12 @@ function Dashboard() {
     <div className="col-md-6">
       <div className="form-group pb-md-2">
         <label htmlFor="firstName" className="pb-2 text-boldd">
-          First Name: <span>*</span>
+          Street Code: <span>*</span>
         </label>
         <input
           type="text"
           className="form-control place-holder"
-          placeholder="User's name"
+          placeholder="Street code"
           autoComplete="off"
           value={firstName}
           name="firstName"
@@ -1160,66 +900,19 @@ function Dashboard() {
 
     <div className="col-md-6">
       <div className="form-group pb-md-2">
-        <label htmlFor="lastName" className="pb-2 text-boldd">
-          Last Name: <span>*</span>
+        <label htmlFor="role" className="pb-2 text-boldd">
+          Priority: <span>*</span>
         </label>
-        <input
-          type="text"
+        <select
+          className="form-select"
           value={lastName}
-          className="form-control place-holder"
-          placeholder="User's last name"
-          autoComplete="off"
-          name="lastName"
           onChange={(e) => {
             setlastNameError("");
             setLastName(e.target.value);
           }}
-        />
-        {lastNameError && (
-          <p className="error-message">{lastNameError}</p>
-        )}
-      </div>
-    </div>
-
-    <div className="col-md-6">
-      <div className="form-group pb-md-2">
-        <label htmlFor="email" className="pb-2 text-boldd">
-          Email: <span>*</span>
-        </label>
-        <input
-          type="email"
-          value={email}
-          className="form-control place-holder"
-          placeholder="example@kpi.com.na"
-          autoComplete="off"
-          name="email"
-          onChange={(e) => {
-            setEmailError("");
-            setEmail(e.target.value);
-          }}
-        />
-        {emailError && (
-          <p className="error-message">{emailError}</p>
-        )}
-      </div>
-    </div>
-
-
-    <div className="col-md-6">
-      <div className="form-group pb-md-2">
-        <label htmlFor="role" className="pb-2 text-boldd">
-          Role: <span>*</span>
-        </label>
-        <select
-          className="form-select"
-          value={role}
-          onChange={(e) => {
-            setRoleError("");
-            setRole(e.target.value);
-          }}
         >
           <option value="" disabled>
-            Select role
+            Select priority
           </option>
           {roleOptions.map((option) => (
             <option value={option.value} key={option.value}>
@@ -1233,25 +926,32 @@ function Dashboard() {
       </div>
     </div>
 
+
+
     <div className="col-md-6">
       <div className="form-group pb-md-2">
-        <label htmlFor="contactNumber" className="pb-2 text-boldd">
-          Contact Number: <span>*</span>
+        <label htmlFor="role" className="pb-2 text-boldd">
+          Status: <span>*</span>
         </label>
-        <input
-          type="text"
-          value={contactNumber}
-          className="form-control place-holder"
-          placeholder="081 *** ****"
-          autoComplete="off"
-          name="contactNumber"
+        <select
+          className="form-select"
+          value={role}
           onChange={(e) => {
-            setContactNumberError("");
-            setContactNumber(e.target.value);
+            setRoleError("");
+            setRole(e.target.value);
           }}
-        />
-        {contactNumberError && (
-          <p className="error-message">{contactNumberError}</p>
+        >
+          <option value="" disabled>
+            Select role
+          </option>
+          {companyDepartmentsOptions.map((option) => (
+            <option value={option.value} key={option.value}>
+              {option.value}
+            </option>
+          ))}
+        </select>
+        {roleError && (
+          <p className="error-message">{roleError}</p>
         )}
       </div>
     </div>
@@ -1278,7 +978,7 @@ function Dashboard() {
             <Box sx={modalStyle}>
               <div className="d-flex justify-content-between align-items-center">
                 <div></div>
-                <h1 className="text-center">Update {roleDetails} Details</h1>
+                <h1 className="text-center">Update Street Details</h1>
                 <CgCloseR
                   style={{
                     color: "red",
@@ -1288,15 +988,11 @@ function Dashboard() {
                   onClick={() => {
                     setFirstNameDetails("");
                     setLastNameDetails("");
-                    setEmailDetails("");
                     
-                    setDepartmentDetails("");
                     setRoleDetails("");
                     setFirstNameDetailsError("");
                     setlastNameDetailsError("");
-                    setEmailDetailsError("");
-                    setContactNumberDetailsError("");
-                   
+                    
                     setRoleDetailsError("");
                     setUpdatingFail("");
                     setOpenModelEditing(false);
@@ -1315,13 +1011,13 @@ function Dashboard() {
   <div className="col-12 col-md-6">
     <div className="form-group pb-md-2">
       <label htmlFor="firstName" className="pb-2 text-boldd">
-        First Name: <span>*</span>
+        Street code: <span>*</span>
       </label>
       <input
         type="text"
         value={firstNameDetails}
         className="form-control place-holder"
-        placeholder="Admin's name"
+        placeholder="Street code"
         autoComplete="off"
         name="firstName"
         onChange={(e) => {
@@ -1338,68 +1034,20 @@ function Dashboard() {
 
   <div className="col-12 col-md-6">
     <div className="form-group pb-md-2">
-      <label htmlFor="lastName" className="pb-2 text-boldd">
-        Last Name: <span>*</span>
+      <label htmlFor="role" className="pb-2 text-boldd">
+        Priority: <span>*</span>
       </label>
-      <input
-        type="text"
+      <select
+        className="form-select"
         value={lastNameDetails}
-        className="form-control place-holder"
-        placeholder="Admin's last name"
-        autoComplete="off"
-        name="lastName"
         onChange={(e) => {
           setlastNameDetailsError("");
           setUpdatingFail("");
           setLastNameDetails(e.target.value);
         }}
-      />
-      {lastNameDetailsError && (
-        <p className="error-message">{lastNameDetailsError}</p>
-      )}
-    </div>
-  </div>
-
-  <div className="col-12 col-md-6">
-    <div className="form-group pb-md-2">
-      <label htmlFor="email" className="pb-2 text-boldd">
-        Email: <span>*</span>
-      </label>
-      <input
-        type="email"
-        value={emailDetails}
-        className="form-control place-holder"
-        placeholder="example@nipdb.com.na"
-        autoComplete="off"
-        name="email"
-        onChange={(e) => {
-          setUpdatingFail("");
-          setEmailDetailsError("");
-          setEmailDetails(e.target.value);
-        }}
-      />
-      {emailDetailsError && (
-        <p className="error-message">{emailDetailsError}</p>
-      )}
-    </div>
-  </div>
-
-  <div className="col-12 col-md-6">
-    <div className="form-group pb-md-2">
-      <label htmlFor="role" className="pb-2 text-boldd">
-        Role: <span>*</span>
-      </label>
-      <select
-        className="form-select"
-        value={roleDetails}
-        onChange={(e) => {
-          setRoleDetailsError("");
-          setUpdatingFail("");
-          setRoleDetails(e.target.value);
-        }}
       >
         <option value="" disabled>
-          Select role
+          Select priority
         </option>
         {roleOptions.map((option) => (
           <option value={option.value} key={option.value}>
@@ -1413,39 +1061,44 @@ function Dashboard() {
     </div>
   </div>
 
+
   <div className="col-12 col-md-6">
     <div className="form-group pb-md-2">
-      <label htmlFor="contactNumberDetails" className="pb-2 text-boldd">
-        Contact Number: <span>*</span>
+      <label htmlFor="role" className="pb-2 text-boldd">
+        Status: <span>*</span>
       </label>
-      <input
-        type="text"
-        value={contactNumberDetails}
-        className="form-control place-holder"
-        placeholder="081*******"
-        autoComplete="off"
-        name="contactNumberDetails"
+      <select
+        className="form-select"
+        value={roleDetails}
         onChange={(e) => {
-          setContactNumberDetailsError("");
+          setRoleDetailsError("");
           setUpdatingFail("");
-          setContactNumberDetails(e.target.value);
+          setRoleDetails(e.target.value);
         }}
-      />
-      {contactNumberDetailsError && (
-        <p className="error-message">{contactNumberDetailsError}</p>
+      >
+        <option value="" disabled>
+          Select role
+        </option>
+        {companyDepartmentsOptions.map((option) => (
+          <option value={option.value} key={option.value}>
+            {option.value}
+          </option>
+        ))}
+      </select>
+      {roleDetailsError && (
+        <p className="error-message">{roleDetailsError}</p>
       )}
     </div>
   </div>
+
 
   <div className="col-12 d-flex justify-content-center mt-md-4">
     <button
       className="btn btn-warning m-1 p-2 w-50 text-boldd"
       onClick={handleSubmitUpdate}
-      disabled={updatingDetails.firstName === firstNameDetails &&
-      updatingDetails.lastName === lastNameDetails &&
-      updatingDetails.email === emailDetails &&
-      updatingDetails.role === roleDetails &&
-      updatingDetails.contactNumber === contactNumberDetails }
+      disabled={updatingDetails.streetCode === firstNameDetails &&
+      updatingDetails.priority === lastNameDetails &&
+      updatingDetails.status === roleDetails }
     >
       Update
     </button>
@@ -1460,4 +1113,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default User;

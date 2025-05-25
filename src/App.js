@@ -9,16 +9,17 @@ import Topbar from "./components/admin/TopBar";
 import Sidebar from "./components/admin/SideBar";
 import Dashboard from "./pages/Dashboard";
  import Email from "./pages/Email";
-// import Content from "./pages/Content";
+ import Devices from "./pages/Devices";
 // import Msme from "./pages/Msme";
-// import User from "./pages/User";
+import Users from "./pages/Users";
 // import Notifications from "./pages/Notifications";
-// import Reporting from "./pages/Reporting";
+import Reporting from "./pages/Reports";
 import Profile from "./pages/Profile";
 import { useSelector } from "react-redux";
 import AdminRoute from "./AdminRoute";
 // import SubmitEmail from "./pages/SubmitEmail";
  import ForgotPassword from "./pages/ChangePassword";
+import Shifts from "./pages/Shifts";
 
 function App() {
   const [openSidebarToggle, setOpenSidebarToggle] = useState(false);
@@ -58,6 +59,10 @@ function App() {
                   <Route element={<AdminRoute />}>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/profile" element={<Profile />} />
+                     <Route path="/users" element={<Users />} />
+                     <Route path="/reports" element={<Reporting />} /> 
+                      <Route path="/devices" element={<Devices />} /> 
+                      <Route path="/shifts" element={<Shifts />} />
                     {/* <Route path="/bso" element={<Bso />} />
                     <Route path="/users" element={<User />} />
                     <Route path="/content" element={<Content />} />

@@ -9,18 +9,17 @@ const ViewButton = ({ onClick }) => {
       variant="contained"
       onClick={onClick}
       style={{
-        backgroundColor: "rgba(0, 149, 72, 1)",
+         background: "linear-gradient(to right, #8b0000, #ff1a1a)",
         color: "#fff",
         padding: "6px",
         paddingLeft: "10px",
         borderRadius: "5px",
         cursor: "pointer",
         fontFamily:"Montserrat, sans-serif",
-        width: "50%",
+        width: "100%",
       }}
     >
-      View
-      <FaEye size={14} style={{ marginLeft: "10px" }} />
+      Download
     </Button>
   );
 };

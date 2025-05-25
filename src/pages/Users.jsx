@@ -45,7 +45,7 @@ const modalStyle = {
   overflowY: 'auto'
 };
 
-function Dashboard() {
+function User() {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
@@ -58,7 +58,6 @@ function Dashboard() {
   const [totalAdmins, setTotalAdmins] = useState("");
   const [totalAppUsers, setTotalAppUsers] = useState("");
   const [adminList, setAdminList] = useState([]);
-  const [streetList, setStreetList] = useState([]);
 
   const [firstName, setFirstName] = useState("");
   const [firstNameError, setFirstNameError] = useState("");
@@ -125,52 +124,16 @@ function Dashboard() {
     setOpenModelEditing(false);
   };
   useEffect(() => {
-      const fetchApprovedCount = async () => {
-        try {
-          dispatch(toggleIsSubmittingTrue());
-          const response = await fetch(
-            "http://localhost:4000/street/all-street",
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              //  Authorization: `${serverToken}`,
-              //  'x-access-token': `${tokenHeader}`
-              },
-              
-            }
-          );
-  
-          const data = await response.json();
-          
-  
-          if (response.ok) {
-            dispatch(toggleIsSubmittingfalse());
-            setStreetList(data.data);
-          } else {
-            dispatch(toggleIsSubmittingfalse());
-           // handleAuthFailure({ dispatch, navigate, type: "auth" });
-          }
-        } catch (error) {
-          dispatch(toggleIsSubmittingfalse());
-          
-        }
-      };
-  
-      fetchApprovedCount();
-    }, [isSubmitting]);
-  useEffect(() => {
     const fetchTotalCount = async () => {
       try {
         dispatch(toggleIsSubmittingTrue());
         const response = await fetch(
-          "http://localhost:4000/supervisor/all-users",
+          "http://localhost:4000/supervisor/all-devices",
           {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-             // Authorization: `${serverToken}`,
-             // 'x-access-token': `${tokenHeader}`
+  
             },
             
           }
@@ -180,6 +143,7 @@ function Dashboard() {
 
         if (response.ok) {
           dispatch(toggleIsSubmittingfalse());
+          console.log(data.total)
           setTotalSystemUsers(data.total);
         } else {
           dispatch(toggleIsSubmittingfalse());
@@ -359,6 +323,7 @@ function Dashboard() {
         setEmailDetails(data.data.email);
         setRoleDetails(data.data.role);
         setContactNumberDetails(data.data.phoneNumber);
+        setDepartmentDetails(data.data.device);
         setOpenModelEditing(true);
         //setAdminList(data.data);
       } else {
@@ -462,7 +427,7 @@ function Dashboard() {
               Swal.fire({
                 position: "center",
                 icon: "success",
-                title: `${updatingDetails.role} Successfully Deleted`,
+                title: `User Successfully Deleted`,
                 showConfirmButton: false,
                 timer: 4000,
               });
@@ -499,7 +464,7 @@ function Dashboard() {
     },
     { field: "email", headerName: "Email", width: isSmallScreen ? 120 : 220 },
     { field: "role", headerName: "Role", width: isSmallScreen ? 130 : 130 },
-    { field: "device", headerName: "Device", width: isSmallScreen ? 130 : 150 },
+    { field: "department", headerName: "Device", width: isSmallScreen ? 130 : 150 },
     {
       field: "createdAt",
       headerName: "Created Date",
@@ -509,16 +474,16 @@ function Dashboard() {
       field: "action",
       headerName: "",
       width: isSmallScreen ? 230 : 350,
-      // renderCell: (params) => (
-      //   <>
-      //     {currentUser.role !== "Marshall" && (
-      //       <>
-      //         <UpdateButton onClick={() => handleUpdate(params.row.email)} />
-      //         <DeleteButton onClick={() => handleDeletion(params.row.email)} />
-      //       </>
-      //     )}
-      //   </>
-      // ),
+      renderCell: (params) => (
+        <>
+          {currentUser.role !== "Marshall" && (
+            <>
+              <UpdateButton onClick={() => handleUpdate(params.row.email)} />
+              <DeleteButton onClick={() => handleDeletion(params.row.email)} />
+            </>
+          )}
+        </>
+      ),
     },
   ];
 
@@ -528,39 +493,11 @@ function Dashboard() {
     lastName: admin.lastName,
     email: admin.email,
     role: admin.role,
-    device: admin.device,
+    department: admin.device,
     createdAt: admin.createdAt,
   }));
 
   const filteredRows = rows.filter((row) =>
-    Object.values(row).some((value) =>
-      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  );
-
-  const streetRows = streetList.map((admin) => ({
-    id: admin.id,
-    streetCode: admin.streetCode,
-    priority: admin.priority,
-    status: admin.status
-  }));
-
-  const streetColumns = [
-      {
-        field: "streetCode",
-        headerName: "Street code",
-        width: isSmallScreen ? 100 : 170,
-      },
-      {
-        field: "priority",
-        headerName: "Priority",
-        width: isSmallScreen ? 100 : 170,
-      },
-      { field: "status", headerName: "Status", width: isSmallScreen ? 120 : 220 },
-      
-    ];
-
-  const filteredStreetRows = streetRows.filter((row) =>
     Object.values(row).some((value) =>
       value.toString().toLowerCase().includes(searchQuery.toLowerCase())
     )
@@ -711,6 +648,7 @@ function Dashboard() {
             lastname: lastNameDetails,
             email: emailDetails,
             phoneNumber: contactNumberDetails,
+            device: departmentDetails || "",
             role: roleDetails,
           };
           const response = await fetch(
@@ -768,6 +706,7 @@ function Dashboard() {
   };
   const handleSubmit = async () => {
     if (validateFields1()) {
+      console.log("here is the device: ",department)
       try {
         setIsSubmitting(true);
         const requestData = {
@@ -775,6 +714,7 @@ function Dashboard() {
           lastname:lastName,
           email,
           phoneNumber:contactNumber,
+          device: department || "",
           role,
         };
 
@@ -806,6 +746,7 @@ function Dashboard() {
           setLastName("");
           setEmail("");
           setContactNumber("");
+          setDepartment("")
           setRole("");
         } else {
           setIsSubmitting(false);
@@ -821,6 +762,7 @@ function Dashboard() {
           setLastName("");
           setEmail("");
           setContactNumber("");
+          setDepartment("")
           setRole("");
         }
       } catch (error) {
@@ -861,8 +803,8 @@ function Dashboard() {
               >
                 <div className="col-12 p-5 shadow rounded-2">
                   <div className="d-flex justify-content-between">
-                    <Tooltip title="Total Users" className="pointer">
-                      <p className="text">Total Users</p>
+                    <Tooltip title="Total devices" className="pointer">
+                      <p className="text">Devices</p>
                     </Tooltip>
                     
                   </div>
@@ -884,7 +826,7 @@ function Dashboard() {
               >
                 <div className="col-12 p-5 shadow rounded-2">
                   <div className="d-flex justify-content-between">
-                    <Tooltip title="Super admins" className="pointer">
+                    <Tooltip title="Total marshalls" className="pointer">
                       <p className="text">Marshalls</p>
                     </Tooltip>
 
@@ -907,7 +849,7 @@ function Dashboard() {
               >
                 <div className="col-12 p-5 shadow rounded-2">
                   <div className="d-flex justify-content-between">
-                    <Tooltip title="Admins" className="pointer">
+                    <Tooltip title="Total supervisors" className="pointer">
                       <p className="text">Supervisors</p>
                     </Tooltip>
 
@@ -931,7 +873,7 @@ function Dashboard() {
               >
                 <div className="col-12 p-5 shadow rounded-2">
                   <div className="d-flex justify-content-between">
-                    <Tooltip title="Mobile App Users" className="pointer">
+                    <Tooltip title="Total admins" className="pointer">
                       <p className="text">Admins</p>
                     </Tooltip>
 
@@ -950,7 +892,32 @@ function Dashboard() {
                 gridRow="span 3"
               >
                 <div className="col-12 mb-4 listing-msme p-4 shadow rounded-3 mb-4">
-                  
+                  <div className="col-12 col-lg-12 col-xxl-9 mx-auto mt-4 d-flex justify-content-end">
+                    <Box
+                      display="flex"
+                      backgroundColor="rgba(245, 246, 248, 1)"
+                      borderRadius="3px"
+                      width="300px"
+                      marginRight="10px"
+                    >
+                      {/* rgba(245, 246, 248, 1) */}
+                      <InputBase
+                        sx={{ ml: 2, flex: 1 }}
+                        placeholder="Search here........."
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                      <IconButton type="button" sx={{ p: 1 }}>
+                        <SearchIcon />
+                      </IconButton>
+                    </Box>
+                    {currentUser.role === "Supervisor" && (
+                      <>
+                        <div onClick={handleOpen}>
+                          <MyButton text="Add User" />
+                        </div>
+                      </>
+                    )}
+                  </div>
                   <div className="col-12 mt-1">
                     <p className="list-groupp">System User List</p>
                     {adminList ? (
@@ -959,89 +926,6 @@ function Dashboard() {
                           <DataGrid
                             rows={filteredRows}
                             columns={columns}
-                            sx={{
-                              "& .MuiDataGrid-root": {
-                                fontFamily: "Montserrat, sans-serif",
-                              },
-                              "& .status-pending": {
-                                color: "rgb(234, 156, 0)",
-                              },
-                              "& .status-rejected": {
-                                color: "red",
-                              },
-                              "& .status-approved": {
-                                color: "green",
-                              },
-                              "& .MuiDataGrid-columnHeaders": {
-                                fontWeight: 800,
-                                fontFamily: "Montserrat, sans-serif",
-                              },
-                              "& .MuiDataGrid-columnHeaderTitle": {
-                                fontWeight: 600,
-                                fontFamily: "Montserrat, sans-serif",
-                              },
-                              "& .MuiDataGrid-cell": {
-                                fontWeight: 400,
-                                fontFamily: "Montserrat, sans-serif",
-                              },
-                            }}
-                            initialState={{
-                              pagination: {
-                                paginationModel: {
-                                  pageSize: 25, 
-                                },
-                              },
-                            }}
-                            pageSizeOptions={[25, 50, 100]}
-                            checkboxSelection
-                            disableRowSelectionOnClick
-                          />
-                        </Box>
-                      </>
-                    ) : (
-                      <>
-                        <div
-                          className="d-flex justify-content-center align-items-center"
-                          style={{ height: 500, width: "100%" }}
-                        >
-                          <div style={{ textAlign: "center" }}>
-                            <CircularProgress color="inherit" />
-                            <p className="p-4 text-secondary">
-                              Just a moment, we’re getting things ready...
-                            </p>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </Box>
-            </Box>{" "}
-          </Box>
-          <Box className="" justifyContent={"space-evenly"} marginTop={"180px"}>
-            <Box
-              display="grid"
-              gridTemplateColumns={
-                isSmallScreen ? "repeat(1, 1fr)" : "repeat(12, 1fr)"
-              }
-              gridAutoRows="140px"
-              gap={isSmallScreen ? "0px" : "10px"}
-            >
-
-              <Box
-                gridColumn={isSmallScreen ? "span 12" : "span 12"}
-                gridRow="span 3"
-              >
-                <div className="col-12 mb-4 listing-msme p-4 shadow rounded-3 mb-4">
-                  
-                  <div className="col-12 mt-1">
-                    <p className="list-groupp">Street List</p>
-                    {adminList ? (
-                      <>
-                        <Box sx={{ height: 500, width: "100%" }}>
-                          <DataGrid
-                            rows={filteredStreetRows}
-                            columns={streetColumns}
                             sx={{
                               "& .MuiDataGrid-root": {
                                 fontFamily: "Montserrat, sans-serif",
@@ -1127,6 +1011,7 @@ function Dashboard() {
                     setlastNameError("");
                     setEmailError("");
                     setContactNumberError("");
+                    setDepartment("")
                     setRoleError("");
                     setOpenModel(false);
                   }}
@@ -1255,6 +1140,28 @@ function Dashboard() {
         )}
       </div>
     </div>
+    {
+      role === "Marshall" && (
+        <div className="col-md-6">
+      <div className="form-group pb-md-2">
+        <label htmlFor="contactNumber" className="pb-2 text-boldd">
+          Device:
+        </label>
+        <input
+          type="text"
+          value={department}
+          className="form-control place-holder"
+          placeholder="Issue device"
+          autoComplete="off"
+          name="department"
+          onChange={(e) => {
+            setDepartment(e.target.value);
+          }}
+        />
+      </div>
+    </div>
+      )
+    }
 
     <div className="col-12 d-flex justify-content-center mt-md-4">
       <button
@@ -1296,7 +1203,7 @@ function Dashboard() {
                     setlastNameDetailsError("");
                     setEmailDetailsError("");
                     setContactNumberDetailsError("");
-                   
+                   setDepartmentDetails("")
                     setRoleDetailsError("");
                     setUpdatingFail("");
                     setOpenModelEditing(false);
@@ -1436,6 +1343,29 @@ function Dashboard() {
       )}
     </div>
   </div>
+  {
+    roleDetails === "Marshall" && (
+      <div className="col-12 col-md-6">
+    <div className="form-group pb-md-2">
+      <label htmlFor="contactNumberDetails" className="pb-2 text-boldd">
+        Device:
+      </label>
+      <input
+        type="text"
+        value={departmentDetails}
+        className="form-control place-holder"
+        placeholder="Issue device"
+        autoComplete="off"
+        name="departmentDetails"
+        onChange={(e) => {
+          setUpdatingFail("");
+          setDepartmentDetails(e.target.value);
+        }}
+      />
+    </div>
+  </div>
+    )
+  }
 
   <div className="col-12 d-flex justify-content-center mt-md-4">
     <button
@@ -1460,4 +1390,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default User;

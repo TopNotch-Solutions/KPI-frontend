@@ -1,0 +1,77 @@
+/* MarshalDashboard.css */
+
+/* Card hover effect */
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  /* transition: all 0.3s ease; */
+  cursor: pointer;
+}
+
+/* Title styling */
+h1 {
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+/* Tab content spacing */
+.tab-content {
+  margin-top: 1rem;
+}
+
+/* Custom modal style (optional) */
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.modal-body p {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+/* Print view styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .container,
+  .container * {
+    visibility: visible;
+  }
+
+  .container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  .btn,
+  .form-control,
+  .nav,
+  .modal {
+    display: none !important;
+  }
+}
+.card.border-danger {
+  background-color: #fff5f5;
+}
+
+.card.border-primary {
+  background-color: #f0f8ff;
+}
+/* Make tabs red/white depending on active state */
+.nav-tabs .nav-link {
+  color: #dc3545; /* Bootstrap red */
+  background-color: white;
+  border: 1px solid #dc3545;
+  transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
