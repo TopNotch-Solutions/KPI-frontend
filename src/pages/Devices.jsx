@@ -71,10 +71,16 @@ function User() {
   const [contactNumberError, setContactNumberError] = useState("");
   const [role, setRole] = useState("");
   const [roleError, setRoleError] = useState("");
-  const [newData, setNewData] = useState([])
+  const [newData, setNewData] = useState([]);
+
+  const [morningShift, setMorningShift] = useState(0);
+  const [afternoonShift, setAfternoonShift] = useState(0);
+  const [morningShiftDetails, setMorningShiftDetails] = useState(null);
+  const [afternoonShiftDetails, setAfternoonShiftDetails] = useState(null);
 
   const [firstNameDetails, setFirstNameDetails] = useState("");
   const [firstNameDetailsError, setFirstNameDetailsError] = useState("");
+
   const [lastNameDetails, setLastNameDetails] = useState("");
   const [lastNameDetailsError, setlastNameDetailsError] = useState("");
   const [emailDetails, setEmailDetails] = useState("");
@@ -320,6 +326,8 @@ if (response.ok) {
   setFirstNameDetails(street.streetCode);
   setLastNameDetails(street.priority);
   setRoleDetails(street.status);
+  setMorningShiftDetails(street.morningShift);
+  setAfternoonShiftDetails(street.afternoonShift)
   setOpenModelEditing(true);
       } else {
         await Swal.fire({
@@ -402,9 +410,11 @@ if (response.ok) {
     {
       field: "priority",
       headerName: "Priority",
-      width: isSmallScreen ? 100 : 170,
+      width: isSmallScreen ? 100 : 150,
     },
-    { field: "status", headerName: "Status", width: isSmallScreen ? 120 : 220 },
+    { field: "status", headerName: "Status", width: isSmallScreen ? 120 : 150 },
+    { field: "morningShift", headerName: "Morning shift total", width: isSmallScreen ? 120 : 150 },
+    { field: "afternoonShift", headerName: "Afternoon shift total", width: isSmallScreen ? 120 : 160 },
     {
       field: "action",
       headerName: "",
@@ -426,7 +436,9 @@ if (response.ok) {
     id: admin.id,
     streetCode: admin.streetCode,
     priority: admin.priority,
-    status: admin.status
+    status: admin.status,
+    morningShift: admin.morningShift,
+    afternoonShift: admin.afternoonShift
   }));
 
   const filteredRows = rows.filter((row) =>
@@ -502,7 +514,9 @@ if (response.ok) {
     if (
       updatingDetails.streetCode === firstNameDetails &&
       updatingDetails.priority === lastNameDetails &&
-      updatingDetails.status === roleDetails
+      updatingDetails.status === roleDetails &&
+      updatingDetails.morningShift === morningShiftDetails &&
+      updatingDetails.afternoonShift === afternoonShiftDetails
     ) {
       setUpdatingFail("You have not made any changes");
     } else {
@@ -514,6 +528,8 @@ if (response.ok) {
             streetCode: firstNameDetails,
             priority: lastNameDetails,
             status: roleDetails,
+            morningShift: morningShiftDetails,
+            afternoonShift: afternoonShiftDetails
           };
           const response = await fetch(
             `http://localhost:4000/street/single`,
@@ -543,6 +559,8 @@ if (response.ok) {
             setLastNameDetails("");
             setEmailDetails("");
             setContactNumberDetails("");
+            setMorningShiftDetails(null);
+            setAfternoonShiftDetails(null);
             setRoleDetails("");
           } else {
             setIsSubmitting(false);
@@ -558,6 +576,8 @@ if (response.ok) {
             setLastNameDetails("");
             setEmailDetails("");
             setContactNumberDetails("");
+            setMorningShiftDetails(null);
+            setAfternoonShiftDetails(null);
             setRoleDetails("");
           }
         } catch (error) {
@@ -577,6 +597,8 @@ if (response.ok) {
           streetCode:firstName,
           priority:lastName,
           status:role,
+          morningShift,
+          afternoonShift
         };
 
         const response = await fetch(
@@ -592,7 +614,7 @@ if (response.ok) {
         );
 
         const data = await response.json();
-
+        console.log("This is causing the issue: ",data)
         if (response.ok) {
           setOpenModel(false);
           setIsSubmitting(false);
@@ -605,7 +627,8 @@ if (response.ok) {
           });
           setFirstName("");
           setLastName("");
-          
+          setMorningShift(0);
+          setAfternoonShift(0)
           setRole("");
         } else {
           setIsSubmitting(false);
@@ -619,7 +642,8 @@ if (response.ok) {
           });
           setFirstName("");
           setLastName("");
-          
+          setMorningShift(0);
+          setAfternoonShift(0)
           setRole("");
         }
       } catch (error) {
@@ -767,7 +791,7 @@ if (response.ok) {
                         <SearchIcon />
                       </IconButton>
                     </Box>
-                    {currentUser.role === "Supervisor" && (
+                    {currentUser.role !== "Marshall" && (
                       <>
                         <div onClick={handleOpen}>
                           <MyButton text="Add Street" />
@@ -955,6 +979,42 @@ if (response.ok) {
         )}
       </div>
     </div>
+    <div className="col-md-6">
+      <div className="form-group pb-md-2">
+        <label htmlFor="firstName" className="pb-2 text-boldd">
+          Morning shift NO: <span>*</span>
+        </label>
+        <input
+          type="number"
+          className="form-control place-holder"
+          placeholder="Enter total number of marshal(morning)"
+          autoComplete="off"
+          value={morningShift}
+          name="morningShift"
+          onChange={(e) => {
+            setMorningShift(e.target.value);
+          }}
+        />
+      </div>
+    </div>
+    <div className="col-md-6">
+      <div className="form-group pb-md-2">
+        <label htmlFor="firstName" className="pb-2 text-boldd">
+          Afternoon shift NO: <span>*</span>
+        </label>
+        <input
+          type="number"
+          className="form-control place-holder"
+          placeholder="Enter total number of marshall(afternoon)"
+          autoComplete="off"
+          value={afternoonShift}
+          name="afternoonShift"
+          onChange={(e) => {
+            setAfternoonShift(e.target.value);
+          }}
+        />
+      </div>
+    </div>
 
     <div className="col-12 d-flex justify-content-center mt-md-4">
       <button
@@ -1090,7 +1150,44 @@ if (response.ok) {
       )}
     </div>
   </div>
-
+<div className="col-md-6">
+      <div className="form-group pb-md-2">
+        <label htmlFor="firstName" className="pb-2 text-boldd">
+          Morning shift NO: <span>*</span>
+        </label>
+        <input
+          type="number"
+          className="form-control place-holder"
+          placeholder="Enter total number of marshal(morning)"
+          autoComplete="off"
+          value={morningShiftDetails}
+          name="morningShift"
+          onChange={(e) => {
+            setUpdatingFail("");
+            setMorningShiftDetails(e.target.value);
+          }}
+        />
+      </div>
+    </div>
+    <div className="col-md-6">
+      <div className="form-group pb-md-2">
+        <label htmlFor="firstName" className="pb-2 text-boldd">
+          Afternoon shift NO: <span>*</span>
+        </label>
+        <input
+          type="number"
+          className="form-control place-holder"
+          placeholder="Enter total number of marshall(afternoon)"
+          autoComplete="off"
+          value={afternoonShiftDetails}
+          name="afternoonShift"
+          onChange={(e) => {
+            setUpdatingFail("");
+            setAfternoonShiftDetails(e.target.value);
+          }}
+        />
+      </div>
+    </div>
 
   <div className="col-12 d-flex justify-content-center mt-md-4">
     <button
@@ -1098,7 +1195,10 @@ if (response.ok) {
       onClick={handleSubmitUpdate}
       disabled={updatingDetails.streetCode === firstNameDetails &&
       updatingDetails.priority === lastNameDetails &&
-      updatingDetails.status === roleDetails }
+      updatingDetails.status === roleDetails &&
+      updatingDetails.morningShift === morningShiftDetails &&
+      updatingDetails.afternoonShift === afternoonShiftDetails
+     }
     >
       Update
     </button>

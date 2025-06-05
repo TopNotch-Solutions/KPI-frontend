@@ -538,9 +538,6 @@ function User() {
 
   const roleOptions = [
     {
-      value: "Supervisor",
-    },
-    {
       value: "Marshall",
     },
     {
@@ -731,7 +728,7 @@ function User() {
         );
 
         const data = await response.json();
-
+        console.log("After inserting my user: ",data)
         if (response.ok) {
           setOpenModel(false);
           setIsSubmitting(false);
@@ -849,30 +846,6 @@ function User() {
               >
                 <div className="col-12 p-5 shadow rounded-2">
                   <div className="d-flex justify-content-between">
-                    <Tooltip title="Total supervisors" className="pointer">
-                      <p className="text">Supervisors</p>
-                    </Tooltip>
-
-                   
-                  </div>
-                  <div className="d-flex align-items-center justify-content-start text-center">
-                    
-                    <Tooltip title={totalAdmins}>
-                      <p className="digit text pointer">{totalAdmins}</p>
-                    </Tooltip>
-                  </div>
-                </div>
-              </Box>
-
-              <Box
-                marginTop={"10px"}
-                gridColumn={isSmallScreen ? "span 12" : "span 3"}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <div className="col-12 p-5 shadow rounded-2">
-                  <div className="d-flex justify-content-between">
                     <Tooltip title="Total admins" className="pointer">
                       <p className="text">Admins</p>
                     </Tooltip>
@@ -910,7 +883,7 @@ function User() {
                         <SearchIcon />
                       </IconButton>
                     </Box>
-                    {currentUser.role === "Supervisor" && (
+                    {currentUser.role !== "Marshall" && (
                       <>
                         <div onClick={handleOpen}>
                           <MyButton text="Add User" />

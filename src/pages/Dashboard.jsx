@@ -542,7 +542,9 @@ function Dashboard() {
     id: admin.id,
     streetCode: admin.streetCode,
     priority: admin.priority,
-    status: admin.status
+    status: admin.status,
+    morningShift: admin.morningShift,
+    afternoonShift: admin.afternoonShift
   }));
 
   const streetColumns = [
@@ -557,7 +559,8 @@ function Dashboard() {
         width: isSmallScreen ? 100 : 170,
       },
       { field: "status", headerName: "Status", width: isSmallScreen ? 120 : 220 },
-      
+       { field: "morningShift", headerName: "Morning shift total", width: isSmallScreen ? 120 : 150 },
+    { field: "afternoonShift", headerName: "Afternoon shift total", width: isSmallScreen ? 120 : 160 },
     ];
 
   const filteredStreetRows = streetRows.filter((row) =>
@@ -897,31 +900,6 @@ function Dashboard() {
                   </div>
                 </div>
               </Box>
-
-              <Box
-                marginTop={"10px"}
-                gridColumn={isSmallScreen ? "span 12" : "span 3"}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <div className="col-12 p-5 shadow rounded-2">
-                  <div className="d-flex justify-content-between">
-                    <Tooltip title="Admins" className="pointer">
-                      <p className="text">Supervisors</p>
-                    </Tooltip>
-
-                   
-                  </div>
-                  <div className="d-flex align-items-center justify-content-start text-center">
-                    
-                    <Tooltip title={totalAdmins}>
-                      <p className="digit text pointer">{totalAdmins}</p>
-                    </Tooltip>
-                  </div>
-                </div>
-              </Box>
-
               <Box
                 marginTop={"10px"}
                 gridColumn={isSmallScreen ? "span 12" : "span 3"}
