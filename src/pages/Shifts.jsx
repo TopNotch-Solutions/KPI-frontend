@@ -130,7 +130,6 @@ const Shifts = () => {
                 <br />
                 <strong>Street Code:</strong> {entry.code}
                 <br />
-                <strong>Supervisor:</strong> {entry.supervisor}
               </Card.Text>
             </Card.Body>
           </Card>
@@ -211,9 +210,6 @@ const Shifts = () => {
     </p>
     <p className="mb-2">
       <strong className="text-muted">Street Code:</strong> {modalData.code}
-    </p>
-    <p className="mb-0">
-      <strong className="text-muted">Supervisor:</strong> {modalData.supervisor}
     </p>
   </Modal.Body>
   <Modal.Footer className="bg-white border-top">
