@@ -75,3 +75,46 @@ h1 {
   color: white;
   border-color: #dc3545;
 }
+@media print {
+  /* Hide everything by default */
+  .d-print-none,
+  .btn,
+  .form,
+  .nav-tabs,
+  .modal {
+    display: none !important;
+  }
+
+  /* Show print table only when printing */
+  .print-table {
+    display: block !important;
+  }
+}
+
+@media print {
+  .print-table {
+    display: block !important;
+    width: 100vw !important; /* Force full viewport width */
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .print-table table {
+    width: 100% !important;
+    table-layout: auto;
+  }
+
+  .print-table th,
+  .print-table td {
+    padding: 8px;
+    word-break: break-word;
+  }
+
+  /* Override Bootstrap container padding in print */
+  .container {
+    width: 100vw !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100vw !important;
+  }
+}

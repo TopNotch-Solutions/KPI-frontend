@@ -857,7 +857,7 @@ function Dashboard() {
             >
               <Box
                 marginTop={"10px"}
-                gridColumn={isSmallScreen ? "span 12" : "span 3"}
+                gridColumn={isSmallScreen ? "span 12" : "span 4"}
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
@@ -880,7 +880,7 @@ function Dashboard() {
 
               <Box
                 marginTop={"10px"}
-                gridColumn={isSmallScreen ? "span 12" : "span 3"}
+                gridColumn={isSmallScreen ? "span 12" : "span 4"}
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
@@ -902,7 +902,7 @@ function Dashboard() {
               </Box>
               <Box
                 marginTop={"10px"}
-                gridColumn={isSmallScreen ? "span 12" : "span 3"}
+                gridColumn={isSmallScreen ? "span 12" : "span 4"}
                 display="flex"
                 alignItems="center"
                 justifyContent="center"

@@ -176,7 +176,7 @@ const Shifts = () => {
         ))}
       </Tabs>
 
-      <div className="text-center mb-3">
+      <div className="text-center mb-3 d-print-none">
         <strong>
           Morning: {currentSchedule.morning.length} | Afternoon: {currentSchedule.afternoon.length} | Total:{' '}
           {currentSchedule.morning.length + currentSchedule.afternoon.length}
@@ -191,8 +191,40 @@ const Shifts = () => {
           Generate shift
         </Button>
       </Form>
+      <div className="print-table d-none d-print-block mt-4">
+  <h4 className="text-center mb-3">{activeDay} Shift Schedule</h4>
+  <table className="table table-bordered table-striped">
+    <thead>
+      <tr>
+       <th style={{ width: '35%' }}>Name</th>
+      <th style={{ width: '20%' }}>Shift</th>
+      <th style={{ width: '25%' }}>Hours</th>
+      <th style={{ width: '35%' }}>Street Code</th>
+      </tr>
+    </thead>
+    <tbody>
+      {[...currentSchedule.morning.map((entry) => ({
+        ...entry,
+        shift: 'Morning',
+        hours: '06:30 - 15:30',
+      })), ...currentSchedule.afternoon.map((entry) => ({
+        ...entry,
+        shift: 'Afternoon',
+        hours: '09:00 - 18:00',
+      }))].map((entry, idx) => (
+        <tr key={idx}>
+          <td>{entry.name}</td>
+          <td>{entry.shift}</td>
+          <td>{entry.hours}</td>
+          <td>{entry.code}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
 
-      <Row>
+
+      <Row className="d-print-none">
         {renderCards('morning', currentSchedule.morning)}
         {renderCards('afternoon', currentSchedule.afternoon)}
       </Row>
